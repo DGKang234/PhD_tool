@@ -1,4 +1,4 @@
-import os, subprocess
+import os
 import numpy as np
 import pandas as pd
 
@@ -9,17 +9,7 @@ import matplotlib.cm as mplcm
 import itertools, re, glob
 import time
 
-pre_dup = input("Would you like to delete any duplicated aims structures? (type rank of aims (delimeter whitespace) : ")
-if len(pre_dup) > 0:
-    pre_dup = pre_dup.split(',')
-    
-else:
-    pre_dup = []
-
-
-radius = input("set hashkey radius (this can be vary depends on the size of clusters) : ")
-#SIZE = input("What is the size of the cluster : ")
-TOP_10 = input("Would you like to plot top 10 aims to klmc connection only ? (y or default n) : ")
+TOP_10 = input("Would you like to plot top 10 aims to klmc connection only ? (y or default n) ")
 yes = ['yes', 'y']
 NUM_COLOURS = input("How many colour would you like to use? : (default 100) ")
 
@@ -32,11 +22,8 @@ else:
 
 def get_dir(A='./'):
     global dir_
-    try:
-        dir_ =  [str(os.path.join(A, x)) for x in os.listdir(A) if os.path.isdir(os.path.join(A, x))]
-        dir_.sort()
-    except FileNotFoundError:
-        print("Probably you are in wrong directory to run the code")
+    dir_ =  [str(os.path.join(A, x)) for x in os.listdir(A) if os.path.isdir(os.path.join(A, x))]
+    dir_.sort()
     return dir_
 
 def get_files(A='./', B=''):
@@ -50,107 +37,33 @@ def atoi(text):
 def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text)]
 
-###########
-# hashkey #
-###########
-def get_xyz(A='./', B='.xyz'):
-    global xyz
-    xyz = [x for x in os.listdir(A) if B in x]
-    return xyz
 
-
-#radius = input("set hashkey radius : ")
-get_xyz('./xyzFiles')
-xyz.sort()
-
-pairing = [['./xyzFiles/' + xyz[i], './xyzFiles/' +  xyz[i+1]] for i in range(0, len(xyz), 2)]
-hkg_path = '/home/uccatka/software/hkg/hkg.py'
-
-print()
-print("----aims----")
-aims = []
-for i in pairing:
-    AIMS = subprocess.check_output(["python", hkg_path, i[0], radius])
-    AIMS = str(AIMS)
-    AIMS = AIMS[2:-3]
-    print(i[0], AIMS)
-    aims.append(AIMS)
-print()
-
-'''
-print("----klmc----")
-klmc = []
-for j in pairing:
-    KLMC = subprocess.check_output(["python", hkg_path, j[0], radius])
-    KLMC = str(KLMC)
-    KLMC = KLMC[2:-3]
-    print(j[0], KLMC)
-    klmc.append(KLMC)
-print()
-'''
-
-aims.append(pre_dup)
-
-
-duplicates = list(set([x for x in aims if aims.count(x) > 1]))
-Pairs = []
-if len(duplicates) == 0:
-    print("There is no duplicated structures among the 'aims' set")
-else:
-    print(f"Lists of duplicated structures :")
-    for num_el, el in enumerate(aims):
-        for num_a, a in enumerate(aims):
-            if el == a:
-                if num_el != num_a:
-                    Pairs.append([num_a+1, num_el+1])
-                    unique_pair = list(set((a,b) if a <= b else (b, a) for a, b in Pairs))
-unique_pair.sort(key=lambda x:x[0])
-
-result = []
-l = unique_pair
-if len(l) > 1:
-  tmp = [l[0]]
-  for i in range(1,len(l)):
-    if l[i][0] == l[i-1][1] or l[i][1] == l[i-1][0] or l[i][1] == l[i-1][1] or l[i][0] == l[i-1][0]:
-      tmp.append(l[i])
-    else:
-      result.append(tmp)
-      tmp = [l[i]]
-  result.append(tmp)
-else:
-  result = l
-
-for elem in result:
-    print(elem)
-print()
-
-#############
-# bipartite #
-#############
 
 get_dir('./ranked')
 
-files_ = [get_files(x, 'aims.out') for x in dir_]
+files_ = [get_files(x, '.out') for x in dir_]
 files_ = list(itertools.chain(*files_))
 files_ = list(set(files_))
+#files_.remove('a.out')
 files_.sort(key=natural_keys)
 
-frame_df = pd.DataFrame(columns={'aims_R','klmc_R', 'aims_E'})
-range_ = [x for x in os.listdir('./xyzFiles/')]
-range_ = list(set(x.split('_')[0] for x in range_))
+#print(files_)
+#print(dir_)
 
-for i in range_:
+frame_df = pd.DataFrame(columns={'aims_R','klmc_R', 'aims_E'})
+for i in dir_:
     for j in files_:
-        aim = os.path.join(f'./ranked/{i}/{j}')
+        aim = os.path.join(f'{i}/{j}')
         for name in glob.glob(aim):
             with open(name) as f:
                 lines = f.readlines()
             for line in lines:
                 if '| Total energy of the DFT / Hartree-Fock s.c.f. calculation      :' in line:
-                    aims_e = line.split('         ')[1]
+                    aims_e = line.split('        ')[1]
                     aims_e = aims_e.split(' ')[0]
 
                     klmc_R = name.split('/')[2]
+                    print(klmc_R, aims_e)
                     frame_df = frame_df.append({'klmc_R': int(klmc_R), 'aims_E':aims_e}, ignore_index=True)
 
 frame_df = frame_df.sort_values(by=['aims_E'], ascending=False)
@@ -158,72 +71,9 @@ frame_df = frame_df.reset_index()
 frame_df['aims_R'] = frame_df.index + 1
 frame_df = frame_df.drop(columns=['index'])
 frame_df = frame_df[['aims_E', 'aims_R', 'klmc_R']]
-print("### After {aims} optimisation ###")
 print(frame_df)
-print()
 frame_df.to_csv('for_bipartite.csv', index = False)
 
-##########################
-# unique structures only #
-##########################
-temp_df = frame_df
-
-top_str = './xyzFiles/'
-top_xyz = [ top_str + x for x in os.listdir(top_str) if 'klmc.xyz' in x]
-top_xyz.sort()
-
-K_energy = []
-for x in top_xyz:
-    with open(x, 'r') as f:
-        for num, line in enumerate(f):
-            if num == 0:
-                k_energy = f.readline()     
-                k_energy = k_energy.split()[2] 
-                K_energy.append(k_energy)
-
-temp_df = temp_df.sort_values(by=['klmc_R'], ascending=True)
-temp_df['klmc_E'] = np.array(K_energy)
-temp_df = temp_df.sort_values(by=['aims_R'], ascending=True)
-temp_df = temp_df[['aims_R', 'aims_E', 'klmc_R', 'klmc_E']]
-
-
-dummy = []
-if len(result) == 1:
-    dummy.append(elem[1])
-else:
-    for elem in result:
-        for a, b in elem:
-            dummy.append(b)
-#print(dummy)
-#if len(pre_dup) > 0:
-#    for i in pre_dup:
-#        dummy.append(i)
-#print("pre_dup")
-#print(dummy)
-del_list = []
-for index, row in temp_df.iterrows():
-    for e in dummy:
-        if e == row['aims_R']:
-            try:
-                del_list.append(e)
-                temp_df.drop(index, inplace = True)
-            except Exception:
-                pass
-
-for i in del_list:
-    try:
-        temp_df.drop(index, inplace = True)
-    except Exception:
-        pass
-
-temp_df.reset_index(drop=True, inplace=True)
-temp_df.to_csv('unique_energy.csv', index = False)
-print("### duplicated {aims} rank ###")
-print(aims)
-print("### Unique set ###")
-print(len(list(set(del_list))), list(set(del_list)))
-print()
-print(temp_df)
 
 ######################
 # Call the .csv file #
@@ -249,6 +99,7 @@ def drawnodes(s,i):
   posy=0
   for n in s:
     plt.gca().add_patch(plt.Rectangle((posx,posy+0.85),width=0.02,height=0.3,fc=color))    # tick marks (patch)
+    #plt.gca().add_patch(plt.Circle((posx,posy+1), 0.1, fc=color))
 
     ###############################
     # position of label of marker #
@@ -344,6 +195,7 @@ for count, i in enumerate(range(1,len(aims_rank)+1)):
             connections.append(elements)
 
 for count, c in enumerate(connections):
+    print(c)
     fig = plt.plot(c[0],c[1]) #,c[2])
     fig[0].set_color(cm(count//3*3.0/NUM_COLOURS))
 
@@ -360,8 +212,4 @@ plt.savefig(f'{file_name}_RchangingAnalysis.pdf')
 
 end = time.time()
 print(f'\nTotal time: {end}')
-
-
-
-
 

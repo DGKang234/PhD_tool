@@ -18,15 +18,15 @@ def get_files(path, ext):
     files = [ (path + x) for x in files ]
     return files
 ###########################################################
-print('please type target working directory (after ~Scratch/')
-target = input()
+#print('please type target working directory (after ~Scratch/')
+target = os.getcwd() #input()
 
 from_ = int(input('from which step do you want to calculate? : '))
 to_   = int(input('up to which step do you want to calculate? : '))
 
 root = '/home/uccatka/auto/copy_this_for_new/'
-path = '/home/uccatka/Scratch/' + target + '/top_structures/'
-dest = '/home/uccatka/Scratch/' + target + '/ranked/'
+path = target + '/top_structures/'  #'/home/uccatka/Scratch/' + target + '/top_structures/'
+dest = target + '/ranked/'          #'/home/uccatka/Scratch/' + target + '/ranked/'
 ###########################################################
 #####       Check contents of the directories        ######
 ###########################################################

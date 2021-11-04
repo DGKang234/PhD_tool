@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUT="geometry.in.out"           # OUTPUT FILE NAME
+OUT="geometry.in"           # OUTPUT FILE NAME
 
 TAR_XYZ=$1                      # SET XYZ INPUT FILE
 

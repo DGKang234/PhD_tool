@@ -22,14 +22,14 @@ def get_files(path, ext):
 
 #List all .xyz files in a specified directory + subdirectories
 
-print('Please type the working directory')
-target = input()
+#print('Please type the working directory')
+target = os.getcwd() #input()
 
 from_ = int(input('from which step do you want to calculate? : '))
 to_   = int(input('up to which step do you want to calculate? : '))
 
-path = '/home/uccatka/Scratch/' + target + '/top_structures/'
-dest = '/home/uccatka/Scratch/' + target + '/ranked/'
+path = target + '/top_structures/'   #'/home/uccatka/Scratch/' + target + '/top_structures/'
+dest = target + '/ranked/'           #'/home/uccatka/Scratch/' + target + '/ranked/'
 
 files = get_files(path, '.xyz')
 try:

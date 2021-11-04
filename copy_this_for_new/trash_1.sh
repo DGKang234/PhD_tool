@@ -4,7 +4,7 @@
 # 1. Force bash as the executing shell.
 #$ -S /bin/bash
 # 2. Request ten minutes of wallclock time (format hours:minutes:seconds).
-#$ -l h_rt=2:0:0
+#$ -l h_rt=4:0:0
 # 3. Request 1 gigabyte of RAM per process.
 #$ -l mem=1G
 # 4. Request 15 gigabyte of TMPDIR space per node (default is 10 GB)
@@ -26,4 +26,4 @@
 #$ -e target_1
 
 # 10. Run our MPI job.  GERun is a wrapper that launches MPI jobs on our clusters.
-gerun /home/uccatka/software/fhi-aims/fhi-aims-new/build/aims.181008.scalapack.mpi.x > target_2.out
+gerun /home/uccatka/software/fhi-aims/fhi-aims-new/build/aims.181008.scalapack.mpi.x > aims.out
