@@ -9,13 +9,13 @@ import matplotlib.cm as mplcm
 import itertools, re, glob
 import time
 
-pre_dup = input("Would you like to delete any duplicated aims structures? (type rank of aims (delimeter whitespace) : ")
+pre_dup = input("Would you like to delete any duplicated aims structures? \
+(type rank of aims (delimeter whitespace) : ")
 if len(pre_dup) > 0:
     pre_dup = pre_dup.split(',')
     
 else:
     pre_dup = []
-
 
 radius = input("set hashkey radius (this can be vary depends on the size of clusters) : ")
 #SIZE = input("What is the size of the cluster : ")
@@ -53,15 +53,16 @@ def natural_keys(text):
 ###########
 # hashkey #
 ###########
+
 def get_xyz(A='./', B='.xyz'):
     global xyz
     xyz = [x for x in os.listdir(A) if B in x]
     return xyz
 
-
 #radius = input("set hashkey radius : ")
 get_xyz('./xyzFiles')
 xyz.sort()
+
 
 pairing = [['./xyzFiles/' + xyz[i], './xyzFiles/' +  xyz[i+1]] for i in range(0, len(xyz), 2)]
 hkg_path = '/home/uccatka/software/hkg/hkg.py'
@@ -72,10 +73,16 @@ aims = []
 for i in pairing:
     AIMS = subprocess.check_output(["python", hkg_path, i[0], radius])
     AIMS = str(AIMS)
-    AIMS = AIMS[2:-3]
+    #AIMS = AIMS[2:-3]
     print(i[0], AIMS)
     aims.append(AIMS)
 print()
+
+with open('aims_hashkey.txt', 'w') as f:
+    for i in range(len(aims)):
+        f.write(aims[i]+'\n')
+
+
 
 '''
 print("----klmc----")
@@ -89,21 +96,36 @@ for j in pairing:
 print()
 '''
 
+
+
 aims.append(pre_dup)
-
-
+print("print aims")
+aims = aims[:-1]
+print(aims)
+print(len(aims))
 duplicates = list(set([x for x in aims if aims.count(x) > 1]))
 Pairs = []
 if len(duplicates) == 0:
     print("There is no duplicated structures among the 'aims' set")
+
 else:
     print(f"Lists of duplicated structures :")
+
+    unique_pair = [(i+1, aims.index(aims[i])+1) for i in range(len(aims)) if not i == aims.index(aims[i])]
+    #dummy = [i+1 for i in range(len(aims)) if not i == aims.index(aims[i])]
+    #print("print dummy")
+    #print(dummy)
+    #print(len(dummy))
+
+
     for num_el, el in enumerate(aims):
         for num_a, a in enumerate(aims):
-            if el == a:
-                if num_el != num_a:
-                    Pairs.append([num_a+1, num_el+1])
+            if el == a:                 # if hashkey is identical
+                if num_el != num_a:     # elimininate the case that recognise the same 
+                                        # ranked structure as duplicated case e.g. 1 = 1, 2 = 2 
+                    Pairs.append([num_a+1, num_el+1])   # paired as tuple
                     unique_pair = list(set((a,b) if a <= b else (b, a) for a, b in Pairs))
+                    # sort as (lesser rank, higher rank) 
 unique_pair.sort(key=lambda x:x[0])
 
 result = []
@@ -120,14 +142,15 @@ if len(l) > 1:
 else:
   result = l
 
+
 for elem in result:
     print(elem)
 print()
 
+
 #############
 # bipartite #
 #############
-
 get_dir('./ranked')
 
 files_ = [get_files(x, 'aims.out') for x in dir_]
@@ -151,7 +174,8 @@ for i in range_:
                     aims_e = aims_e.split(' ')[0]
 
                     klmc_R = name.split('/')[2]
-                    frame_df = frame_df.append({'klmc_R': int(klmc_R), 'aims_E':aims_e}, ignore_index=True)
+                    frame_df = frame_df.append({'klmc_R': int(klmc_R), 'aims_E':aims_e},
+                     ignore_index=True)
 
 frame_df = frame_df.sort_values(by=['aims_E'], ascending=False)
 frame_df = frame_df.reset_index()
@@ -166,6 +190,7 @@ frame_df.to_csv('for_bipartite.csv', index = False)
 ##########################
 # unique structures only #
 ##########################
+
 temp_df = frame_df
 
 top_str = './xyzFiles/'
@@ -194,12 +219,8 @@ else:
     for elem in result:
         for a, b in elem:
             dummy.append(b)
-#print(dummy)
-#if len(pre_dup) > 0:
-#    for i in pre_dup:
-#        dummy.append(i)
-#print("pre_dup")
-#print(dummy)
+
+
 del_list = []
 for index, row in temp_df.iterrows():
     for e in dummy:
@@ -218,8 +239,8 @@ for i in del_list:
 
 temp_df.reset_index(drop=True, inplace=True)
 temp_df.to_csv('unique_energy.csv', index = False)
-print("### duplicated {aims} rank ###")
-print(aims)
+#print("### duplicated {aims} rank ###")
+#print(aims)
 print("### Unique set ###")
 print(len(list(set(del_list))), list(set(del_list)))
 print()
@@ -254,17 +275,17 @@ def drawnodes(s,i):
     # position of label of marker #
     ###############################
     if posx==1:  
-        if int(n) % 10 == 0:
+        if int(n) % 100 == 0:
             ax.annotate(n,xy=(posx+0.08,posy+1))     # label of tick marks
     elif posx==-1:         # location of left-hand side
-        if int(n) % 10 == 0:
+        if int(n) % 100 == 0:
             #ax.annotate(n,xy=(posx-len(n)*0.043,posy+1))
             ax.annotate(n,xy=(posx-0.1, posy+1))
     posy+=1
 
 ####################################################
 
-fig = plt.figure(figsize=(15, 8))
+fig = plt.figure(figsize=(30, 16))      #15, 8))
 ax = fig.add_subplot(111)
 ax.axis("off")
 
@@ -306,8 +327,8 @@ drawnodes(aims_set,2)
 ################################
 # axis title position settings #
 ################################
-ax.text(-1.3, 20, 'aims\n rank', style='italic', fontsize = 15)
-ax.text(1.2, 20, 'klmc\n rank', style='italic', fontsize = 15)
+ax.text(-1.3, 20, 'PBEsol\n rank', style='italic', fontsize = 15)
+ax.text(1.2, 20, 'Shell model\n rank', style='italic', fontsize = 15)
 
 #########################################
 # concatenate aims rank and klmc rank #
@@ -360,7 +381,6 @@ plt.savefig(f'{file_name}_RchangingAnalysis.pdf')
 
 end = time.time()
 print(f'\nTotal time: {end}')
-
 
 
 
