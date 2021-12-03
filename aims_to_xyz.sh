@@ -19,7 +19,7 @@ declare -a config
 
 echo $ATOM_CNT > $OUT
 #echo "#src_path:"$PWD"/"$TAR >> $OUT
-grep -r "| Total energy of the DFT / Hartree-Fock s.c.f. calculation      :" aims.out | awk '{print $12 }' >> $OUT   #'{print $2, $3, $12}' >> $OUT
+grep -r "| Total energy of the DFT / Hartree-Fock s.c.f. calculation      :" aims.out | awk '{print $2, $3, $12}' >> $OUT
 for (( i=0; i<$ATOM_CNT; i++ )); do
 
         rln=$( echo "$i +1 " | bc )

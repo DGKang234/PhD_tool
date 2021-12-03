@@ -26,28 +26,30 @@ def cat_ani_dist(XYZ, size):
                 f.write (str2 + '\n')
             f.close()
         print('\n')
-    #os.remove(temp1)
-
-
 
     array = np.loadtxt(temp2)
     cat = array[0:int(size)]
     ani = array[int(size):]
     print("\n")
 
+    bond_dist=[]
     with open(temp3, 'w') as f:
         for c in cat:
             for a in ani:
                 dist = np.sqrt(np.sum((c-a)**2))
                 if dist < float(2.3):
                     f.write(str(dist)+'\n')
-                    print(str(dist))
+                    bond_dist.append(dist)
+
+    bond_dist.sort(key=float)
+    for i in bond_dist:
+        print(i)
 
     with open(temp3, 'r') as f:
         array = np.loadtxt(temp3)
         average = np.average(array)
         print("\nThe average bond length is : " + str(average))
-
+        print()
     os.remove(temp1)
     os.remove(temp2)
     os.remove(temp3)
