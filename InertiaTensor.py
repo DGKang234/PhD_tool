@@ -1,40 +1,39 @@
+#pip install colored
+from colored import fg, bg, attr
 import sys, math
 import numpy as np
 
-
 kd = lambda i,j : 1. if (i==j) else 0.
+
 class structure_shape:
 
     def __init__(self, f):
         self.xyz_file = f
 
-        #self.__DEGEN_TOL = 0.025
-        #self.__DEGEN_DL  = 7.5
-    
     def load_xyz(self):
 
         with open(self.xyz_file, 'r') as f:
             lines = f.readlines()
             
-            self.c1_n = int(lines[0])                       # number of atoms
-            del lines[0]
-            del lines[0] 
-            self.c1_config = np.zeros((self.c1_n+2, 4))
-
-            self.coord = [x.split() for x in lines]
-            self.coord = np.asarray(self.coord)
+            self.c1_n = int(lines[0])                                       # number of atoms
+            del lines[0]                                                    # del num of atoms
+            del lines[0]                                                    # del energy 
+    
+            self.coord = [x.split() for x in lines]                         # split into atom species, x, y, z coordinate
+            self.coord = np.asarray(self.coord)                             # transform into numpy array
             
-            self.ID = self.coord[:, 0]
-            self.coord = self.coord[:, 1:].astype(float)
+            self.ID = self.coord[:, 0]                                      # atom species
+            self.coord = self.coord[:, 1:].astype(float)                    # atom position
             
-            dummy_atom = np.zeros((1,3), dtype=float)
-            self.coord = np.append(self.coord, dummy_atom, axis = 0) 
-            self.coord = np.append(self.coord, dummy_atom, axis = 0)
+            dummy_atom = np.zeros((1,3), dtype=float)                       # empty array
+            #self.coord = np.append(self.coord, dummy_atom, axis = 0) 
+            #self.coord = np.append(self.coord, dummy_atom, axis = 0)
            
             print()
-            print("### coord ###") 
-            #print(self.coord) 
+            print("### original atomic position ###") 
+            print(self.coord)
         return None
+
 
     def CenterofMass(self, mode = 1):
 
@@ -47,58 +46,46 @@ class structure_shape:
         elif mode == 3:
             an = self.c1_n + 2
 
-        self.com = self.coord.sum(axis=0)
-        self.com = self.com / float(an)
+        self.com = self.coord.sum(axis=0)                                   # sum all cartesian coordinates
+        self.com = self.com / float(an)                                     # divided into number of atoms (mass of every atom = 1)
     
-
-        print()
-        print("### COM ###")
-        #print(an)
-        #print(self.com)
+        print()         
+        print("### Center of mass of the original atomic position ###")
+        print(self.com)
 
         return None
 
-    def Transformation(self, mode = 1):
 
-        if mode == 1:
-            an = self.c1_n + 0
-        if mode == 2: 
-            an = self.c1_n + 1
-        if mode == 3:
-            an = self.c1_n + 2
+    def Transformation(self): 
 
-        self.coord_0th = np.subtract(self.coord[:, 0], self.com[0], out=self.coord[:, 0])
-        self.coord_1st = np.subtract(self.coord[:, 1], self.com[1], out=self.coord[:, 1])
-        self.coord_2nd = np.subtract(self.coord[:, 2], self.com[2], out=self.coord[:, 2])
+        self.coord_x = np.subtract(self.coord[:, 0], self.com[0], out=self.coord[:, 0])    # subtract all of x coordinate with x coordinate of com. same for all y, z
+        self.coord_y = np.subtract(self.coord[:, 1], self.com[1], out=self.coord[:, 1])    
+        self.coord_z = np.subtract(self.coord[:, 2], self.com[2], out=self.coord[:, 2])
 
-        self.coord = list(zip(self.coord_0th, self.coord_1st, self.coord_2nd)) 
-        self.coord = np.array(self.coord)
-        self.coord = np.delete(self.coord, -1, 0)
-        self.coord = np.delete(self.coord, -1, 0)
+        self.coord = list(zip(self.coord_x, self.coord_y, self.coord_z))                   # zip the subtracted coordinates into one list
+        self.coord = np.array(self.coord)                                                  # transform into array
+      
+        #self.coord = np.delete(self.coord, -1, 0)
+        #self.coord = np.delete(self.coord, -1, 0)
 
         dummy_atom = np.zeros((1,3), dtype=float)
-        self.coord = np.append(self.coord, dummy_atom, axis = 0)
-        self.coord = np.append(self.coord, dummy_atom, axis = 0)
+        #self.coord = np.append(self.coord, dummy_atom, axis = 0)
+        #self.coord = np.append(self.coord, dummy_atom, axis = 0)
 
         print()
-        print("### shift COM to my coordinate system (0, 0, 0) ###")
+        print("### Shift atomic positions to the COM (my coordinate system (0, 0, 0)) ###")
         #print(an)
-        #print(self.coord)
+        print(self.coord)
          
         return None
 
 
-    def InertiaTensor(self, mode = 1):
+    def InertiaTensor(self):
         
-        if mode == 1:
-            an = self.c1_n + 0
-        if mode == 2:
-            an = self.c1_n + 1
-        if mode == 3:
-            an = self.c1_n + 2
-
+        an = self.c1_n
+        
         self.itensor = np.zeros((3,3), dtype=float)
-        
+       
         for i in range(an):
             r2 = self.coord[:i+1, 0]**2 + self.coord[:i+1, 1]**2 + self.coord[:i+1, 2]**2
             r2 = r2[-1]
@@ -108,15 +95,16 @@ class structure_shape:
                     
                     self.itensor.itemset((j,k), self.itensor.item((j, k)) + (r2 * kd(j,k) - self.coord[i][j] * self.coord[i][k]))
                     # kd is Kronecker delta
-        
+                    #print(self.itensor)
+
         eigVal, eigVec = np.linalg.eig(self.itensor)
 
         print()
-        print("### inertia tensor ###")
+        print(f"{fg(1)} {bg(15)} ### Inertia tensor ### {attr(0)}")
         print(self.itensor)
 
         print()
-        print("### eige value ###")
+        print(f"{fg(1)} {bg(15)} ### Principal Axes of inertia ###{attr(0)}")
         print(eigVal)
         print() 
         print("### eigenvector ###")
@@ -182,7 +170,3 @@ if __name__ == '__main__':
 
     test.InertiaTensor()
    
-    test.CenterofMass()
-     
-    test.Transformation()
-

@@ -18,20 +18,23 @@ def get_files(path, ext):
     files = [ (path + x) for x in files ]
     return files
 
+def func(elem):
+    return int(elem.split('/')[-1].split('.xyz')[0])
 ##########################################################################################
 
 #List all .xyz files in a specified directory + subdirectories
 
-#print('Please type the working directory')
-target = os.getcwd() #input()
+target = os.getcwd()
+target = target.replace('/scratch/scratch/uccatka', '/home/uccatka/Scratch')
 
 from_ = int(input('from which step do you want to calculate? : '))
 to_   = int(input('up to which step do you want to calculate? : '))
 
-path = target + '/top_structures/'   #'/home/uccatka/Scratch/' + target + '/top_structures/'
-dest = target + '/ranked/'           #'/home/uccatka/Scratch/' + target + '/ranked/'
+path = target + '/top_structures/'   
+dest = target + '/ranked/'          
 
 files = get_files(path, '.xyz')
+files = sorted(files, key=func)
 try:
     os.mkdir(dest)
 except:
@@ -41,32 +44,21 @@ outfile = []
 for i in range(len(files)):
     cur_file = files[i]
     rank = get_rank(files[i])
-    #out = rank + '.xyz'
-
     outfile.append(rank)
-outfile.sort()
 
 
-for i in range(len(outfile)):
-
-    if from_ <= i+1 <= to_:
+for num, i in enumerate(outfile): 
+    if from_ <= num+1 <= to_:
         os.chdir(dest)
 
-        rank = outfile[i].split('/')[-1]
-        os.mkdir(rank)
+        rank = outfile[num].split('/')[-1]
+        print(rank)
 
+        os.mkdir(rank)
+        
         end = dest + rank + '/'
 
-        #print(end)
-
-        #print(outfile[i]+'.xyz')
-
-        shutil.copy(outfile[i] + '.xyz', end)
-
-        os.chdir(path)
-
-        print('\n\nWorking direcotry --  0' + str(i+1) + ' -- DONE')
-
+        shutil.copy(outfile[num] + '.xyz', end)
 
 
 print("\n###############################################")

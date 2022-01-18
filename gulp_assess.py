@@ -19,6 +19,7 @@ def hkg(type_, xyz, rad):
     return hkg_out
 
 target = os.getcwd()
+target = target.replace('/scratch/scratch/uccatka', '/home/uccatka/Scratch')
 
 dir_ranked = target + '/ranked/'
 dir_xyzFiles = target + '/xyzFiles/'
@@ -75,7 +76,21 @@ for x in files:
         f.write(cation)
         f.write(anion_core)
         f.write(anion_shel)
-        f.write(f'species\nAl core 3.00\nF  core 0.59\nF  shel -1.59\nbuck\nAl  core  F   shel  3760.000831  0.222000   0.00000 0.0 10.0\nbuck4\nF   shel  F   shel  1127.7 0.2753 15.83 2.0 2.79 3.031 12.0\nspring\nF     20.77\nxtol opt 6.000\nftol opt 5.000\ngtol opt 8.000\nswitch_min rfo gnorm 0.01\nmaxcyc 2000\n\noutput xyz {dest}')
+        f.write(
+        f'species\n\
+Al core 3.00\n\
+F  core 0.59\n\
+F  shel -1.59\n\
+buck\n\
+Al  core  F   shel  92.6633 0.49 0.0000 0.0 10.0\n\
+buck4\nF   shel  F   shel  1127.7 0.2753 15.83 2.0 2.79 3.031 12.0\n\
+spring\nF     20.77\n\
+xtol opt 6.000\n\
+ftol opt 5.000\n\
+gtol opt 8.000\n\
+switch_min rfo gnorm 0.01\n\
+maxcyc 2000\n\n\
+output xyz {dest}_gulp')             # 3760.000831  0.222000   0.00000 0.0 10.0\n/
 
     print(f'{dest} is read to run GULP')
     
@@ -92,59 +107,62 @@ for x in files:
             print(f'{dest} DONE')
         else:
             print(f'!!!! {dest} Error !!!!')
-            gulp_error.append(d)
+            gulp_error.append(x)
 
     ###############################
     #   hashkey from {aims.xyz}   #
     ############################### 
-
-    cf_cluster = '/home/uccatka/software/CF-CLUSTERpy/CF_CLUSTERSpy_MAIN.py'
-    subprocess.check_output(['python', cf_cluster, dest + '_aims.xyz', dest + '.xyz'])
     
-    '''
-    hkg('DFT',  'CF_1.xyz', 2.46)
-    aims_hkg = hkg_out
+    if 'gulp.xyz' in os.listdir(f'{target}/gulp/{dest}'): 
+        cf_cluster = '/home/uccatka/software/CF-CLUSTERpy/CF_CLUSTERSpy_MAIN.py'
+        subprocess.check_output(['python', cf_cluster, dest + '_aims.xyz', dest + '.xyz'])
+        
+        '''
+        hkg('DFT',  'CF_1.xyz', 2.46)
+        aims_hkg = hkg_out
 
-    hkg('IP ', 'CF_2.xyz', 2.46)
-    gulp_hkg = hkg_out
+        hkg('IP ', 'CF_2.xyz', 2.46)
+        gulp_hkg = hkg_out
 
-    bowl = []
-    bowl.append(aims_hkg)
-    bowl.append(hkg_out)
+        bowl = []
+        bowl.append(aims_hkg)
+        bowl.append(hkg_out)
    
-    bowl = list(set(bowl))
+        bowl = list(set(bowl))
 
-    matching_X = []
-    if len(bowl) == 1:
-        print("The AlF3 potential can predict the structure")
-        print()
-    elif len(bowl) > 1:
-        print("!!!! DFT structure cannot be found in IP landscape")
-        print()
-        matching_X.append(x)
-    '''
-    cf_output = target + '/gulp/' + dest + '/CF.out'
-    with open(cf_output, 'r') as f:
-        lines = f.readlines()
-        scaling = [l for l in lines if 'Scaling Factor :' in l]
-        scaling = ' '.join(scaling).split()[3]
+        matching_X = []
+        if len(bowl) == 1:
+            print("The AlF3 potential can predict the structure")
+            print()
+        elif len(bowl) > 1:
+            print("!!!! DFT structure cannot be found in IP landscape")
+            print()
+            matching_X.append(x)
+        '''
+        cf_output = target + '/gulp/' + dest + '/CF.out'
+        with open(cf_output, 'r') as f:
+            lines = f.readlines()
+            scaling = [l for l in lines if 'Scaling Factor :' in l]
+            scaling = ' '.join(scaling).split()[3]
 
-        if float(scaling) > 0.96:
-            print(dest, "scaling factor : " + scaling) 
-        else:
-            print(dest, " ###### CHECK the xyz #####")
-            caution_scaling.append(dest)
+            if float(scaling) > 0.96:
+                print(dest, "scaling factor : " + scaling) 
+            else:
+                print(dest, " ###### CHECK the xyz #####")
+                caution_scaling.append(dest)
+                 
+            RMS_config = [l for l in lines if 'RMS CONFIG:' in l]
+            RMS_config = ' '.join(RMS_config).split()[2]
+            print(dest, "RMS config :     " + RMS_config)
+            print()
              
-        RMS_config = [l for l in lines if 'RMS CONFIG:' in l]
-        RMS_config = ' '.join(RMS_config).split()[2]
-        print(dest, "RMS config :     " + RMS_config)
-        print()
-         
-    os.chdir('../')
-
+        os.chdir('../')
+    else:
+        os.chdir('../')
 collection = os.listdir('./')
 collection.sort()
 
+'''
 for x in collection:
     with open(x + '/CF_3.xyz', 'r') as f:
         lines = f.readlines()
@@ -155,7 +173,7 @@ for x in collection:
 
 
     print(f'{x} appended to mega.xyz') 
-         
+'''         
 
 
 #print(f"!!!!! {x} DFT structure cannot be found in IP landscape !!!!!")

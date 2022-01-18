@@ -26,4 +26,4 @@
 #$ -e target_1
 
 # 10. Run our MPI job.  GERun is a wrapper that launches MPI jobs on our clusters.
-gerun /home/uccatka/software/fhi-aims/fhi-aims-new/build/aims.181008.scalapack.mpi.x > aims.out
+gerun /home/uccatka/software/FHIaims-master/build/aims.210914.scalapack.mpi.x > aims.out 

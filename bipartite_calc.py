@@ -170,7 +170,7 @@ for i in range_:
                 lines = f.readlines()
             for line in lines:
                 if '| Total energy of the DFT / Hartree-Fock s.c.f. calculation      :' in line:
-                    aims_e = line.split('         ')[1]
+                    aims_e = line.split('        ')[1]
                     aims_e = aims_e.split(' ')[0]
 
                     klmc_R = name.split('/')[2]
