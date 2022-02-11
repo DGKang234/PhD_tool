@@ -54,7 +54,7 @@ for i in range(len(files)):
         xyz = files[i]
         xyz = xyz.replace(ext, prog)
         #print(xyz)
-        cmd = f"echo '{xyz}' | /home/uccatka/auto/RDF/RDF_exe"
+        cmd = f"echo '{xyz}' | /home/uccatka/auto/structure_analysis/RDF/old/RDF_exe"
         print(cmd) 
         subprocess.call(cmd, shell=True)
         os.listdir(path) 

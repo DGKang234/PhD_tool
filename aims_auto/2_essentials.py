@@ -24,7 +24,7 @@ target = os.getcwd() #input()
 from_ = int(input('from which step do you want to calculate? : '))
 to_   = int(input('up to which step do you want to calculate? : '))
 
-root = '/home/uccatka/auto/copy_this_for_new/'
+root = '/home/uccatka/auto/aims_auto/copy_this_for_new/'
 path = target + '/top_structures/'  #'/home/uccatka/Scratch/' + target + '/top_structures/'
 dest = target + '/ranked/'          #'/home/uccatka/Scratch/' + target + '/ranked/'
 ###########################################################

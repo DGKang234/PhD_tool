@@ -6,13 +6,13 @@ from colored import fg, bg, attr
 
 standard = 'fit conp'
 relax = 'relax fit conp'
-#executable = '/home/uccatka/software/gulp-5.1/Src/gulp'
+#executable = '/home/uccatka/software/gulp-5.1/Src/gulp' 
 executable = '/opt/openmpi/gfortran/1.8.4/bin/mpirun -n 1 /usr/local/gulp/gulp-4.2.mpi'
 
 cwd = os.getcwd()
 in_dir = cwd + '/master'
 
-try:
+try: 
     os.mkdir('storage')
 except FileExistsError:
     print()
@@ -20,9 +20,9 @@ except FileExistsError:
     print(f'I presume you have finished the IP fitting calculations so I will collect parameters and\
 SOS in {fg(1)} {bg(15)} Data.csv {attr(0)}')
     print()
-    permission = input("Would you like to continue to collect data? : ").lower()
+    permission = input("Would you like to continue to collect data? : [(Y)es, (N)o] ").lower()
     if 'y' in permission:
-        os.system('python /home/uccatka/auto/IP_collecting_Datacsv.py')
+        os.system('python /home/uccatka/auto/IP/IP_collecting_Datacsv.py')
         sys.exit()
     else:
         sys.exit()
@@ -36,7 +36,7 @@ out_dir = cwd + '/storage'
 #
 
 # Preparing paramters
-job_query = input("Which type of fit would you like to do? [(s)tandard,(r)elax, (b)oth] : ").lower()
+job_query = input("Which type of fit would you like to do? [(S)tandard,(R)elax, or (B)oth] : ").lower()
 
 A_start = float(input("FROM which A value do you want to search? : "))
 A_end = float(input("TO which A value? : "))
@@ -45,7 +45,7 @@ print()
 rho_start = float(input("FROM which rho value do you want to search? : "))
 rho_end = float(input("TO which rho?: "))
 rho_points = int(input("How many data points within the area (rho) would you like to search? : ")) + 1
-
+ 
 input_f = []
 for A in np.linspace(A_start, A_end, num=A_points):
     for Rho in np.linspace(rho_start, rho_end, num=rho_points):
@@ -72,14 +72,14 @@ for num, g in enumerate(groups):
             f.write(job)
 
     #[3]
-    for i in g:
+    for i in g: 
         A = float(i.split('_')[0])               #.split('.gin')[0])
         Rho = float(i.split('_')[1].split('.gin')[0])
 
         with open(f'{in_dir}/gulp.gin', 'r') as f:
             contents = f.read()
 
-            #if any(x in answer_options for x in ('s', 'b')):
+            #if any(x in answer_options for x in ('s', 'b')): 
             if 's' in job_query or 'b' in job_query:
             #[3-1]
                 new_contents_stand = contents.replace('KEYWORDS', standard)
@@ -90,7 +90,7 @@ for num, g in enumerate(groups):
                     f.write(new_contents_stand)
 
 
-            #if any(x in answer_options for x in ('r', 'b')):
+            #if any(x in answer_options for x in ('r', 'b')): 
             if 'r' in job_query or 'b' in job_query:
                 #[3-2]
                 new_contents_relax = contents.replace('KEYWORDS', relax)
@@ -103,12 +103,13 @@ for num, g in enumerate(groups):
         #[2]
         with open(f'{out_dir}/{num}/go.sh', 'a') as f:
             #j = i.replace('in1', 'fit')
-            if 's' in job_query or 'b' in job_query:
+            if 's' in job_query or 'b' in job_query: 
                 f.write(f'{executable} < {out_dir}/{num}/{i}.in1 > {out_dir}/{num}/{i}.fit\n')
-            if 'r' in job_query or 'b' in job_query:
+            if 'r' in job_query or 'b' in job_query: 
                 f.write(f'{executable} < {out_dir}/{num}/{i}.in2 > {out_dir}/{num}/{i}.relax\n')
-
-
-    os.chdir(f'{out_dir}/{num}')
+            
+    
+    os.chdir(f'{out_dir}/{num}') 
     os.system(f'qsub {out_dir}/{num}/go.sh')
     os.chdir('../../')
+

@@ -23,7 +23,6 @@ def get_directories(path):
 from_ = int(input("from which KLMC rank of .xyz and aims optimised .xyz file do you want to collect ? : "))
 to_ = int(input("upto which KLMC rank of .xyz and aims optimised .xyz file do you want to collect ? : "))
 
-root = '/home/uccatka/auto/copy_this_for_new/'
 path = os.getcwd() + '/ranked/'     #'/home/uccatka/Scratch/work/' + t + '/ranked/'
 dest = os.getcwd() + '/xyzFiles/'   #'/home/uccatka/Scratch/work/' + t +'/xyzFiles'
 
@@ -53,7 +52,7 @@ for i in ranked_dir_path:
         print(int(rank_), i)
 
         os.chdir(i)
-        os.system("bash /home/uccatka/auto/aims_to_xyz.sh geometry.in.next_step")
+        os.system("bash /home/uccatka/auto/aims_auto/aims_to_xyz.sh geometry.in.next_step")
         print('.xyz file of aims optimised structure is generated')
         
         dummy = glob.glob(i + '/aims.xyz')    			# ~P/aims.xyz  
