@@ -2,8 +2,6 @@
 
 import os
 import shutil
-import sys
-import fileinput
 
 ##########################################################################################
 
@@ -21,8 +19,6 @@ def get_files(path, ext):
 def func(elem):
     return int(elem.split('/')[-1].split('.xyz')[0])
 ##########################################################################################
-
-#List all .xyz files in a specified directory + subdirectories
 
 target = os.getcwd()
 target = target.replace('/scratch/scratch/uccatka', '/home/uccatka/Scratch')

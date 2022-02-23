@@ -1,8 +1,8 @@
+
 import os
 
 def func(elem):
     return int(elem.split('-')[1].split('.xyz')[0])
-
 
 target = os.getcwd() 
 target = target.replace('/scratch/scratch/uccatka', '/home/uccatka/Scratch')

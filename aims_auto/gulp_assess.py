@@ -82,7 +82,7 @@ Al core 3.00\n\
 F  core 0.59\n\
 F  shel -1.59\n\
 buck\n\
-Al  core  F   shel  92.6633 0.49 0.0000 0.0 10.0\n\
+Al  core  F   shel  3760.000831  0.222000   0.00000 0.0 10.0\n\
 buck4\nF   shel  F   shel  1127.7 0.2753 15.83 2.0 2.79 3.031 12.0\n\
 spring\nF     20.77\n\
 xtol opt 6.000\n\

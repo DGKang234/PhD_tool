@@ -13,12 +13,14 @@ def get_directories(path):
     directories = [(path + x) for x in directories]
     return directories
 
+
 def get_files(path, ext):
     files = [ x for x in os.listdir(path) if ext in x ]
     files = [ (path + x) for x in files ]
     return files
 ###########################################################
-#print('please type target working directory (after ~Scratch/')
+
+
 target = os.getcwd() #input()
 
 from_ = int(input('from which step do you want to calculate? : '))
@@ -38,9 +40,7 @@ _dir = get_directories(dest)
 _dir = get_directories(dest)
 
 file_1 = 'control.in'
-file_4 = 'a.out'
 file_3 = 'trash_1.sh'
-
 
 foo = 'trash_1.sh'
 bar = 'trash.sh'
@@ -50,12 +50,10 @@ wd = os.getcwd()
 
 for i in range(len(_dir)):
     dir_name = _dir[i].split('/')[-1]
-    #print(int(dir_name))
 
     if from_ <= int(dir_name) <= to_:
 
         a = dest + dir_name
-        print(a)
         control = os.path.exists(a + "/geometry.in")
         if control == False:
             shutil.copy(root + file_1, _dir[i])
@@ -98,6 +96,8 @@ for l in range(len(_dir)):
         os.chdir(wd)
 
         print("FHI-aims (DFT) %s is submitted -- GOOD LUCK" % (_dir[l]))
+        print()
+
 print("\n\n###############################################")
 print("#------------Mission accomplished]------------#")
 print("###############################################\n\n")

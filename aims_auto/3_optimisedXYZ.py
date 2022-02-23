@@ -1,11 +1,10 @@
+
 import os
 from shutil import copy
 import sys
 import glob
 import shutil
 
-#os.rename("~/originalFileName", "~/newFileName")
-#shutil.move("~/newFileName", "~/Destination_dir")
 
 def get_rank(input_dir):
     pref = input_dir.split('_')[1]
@@ -16,9 +15,6 @@ def get_directories(path):
     directories = [(path + x) for x in directories]  # now directories = x that x is x + path
     return directories
 
-
-
-#t = input('please type the working directory : ')
 
 from_ = int(input("from which KLMC rank of .xyz and aims optimised .xyz file do you want to collect ? : "))
 to_ = int(input("upto which KLMC rank of .xyz and aims optimised .xyz file do you want to collect ? : "))
@@ -35,9 +31,10 @@ else:
 
 _dir = get_directories(path)
 _dir.sort()
-##########################
-# Make {aims.xyz} files  #
-##########################
+
+'''
+Make {aims.xyz} files  
+'''
 convert = "aims_to_xyz.sh"
 
 max_len = [x for x in os.listdir('./ranked') if x.isdigit and os.path.isdir('./ranked/'+x)]
@@ -74,7 +71,8 @@ for i in ranked_dir_path:
         print()
          
         os.chdir('../')
-print("\n###############################################")
+print()
+print("###############################################")
 print("##-----------Mission accomplished------------##")
 print("###############################################")
 
