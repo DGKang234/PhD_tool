@@ -32,6 +32,10 @@ else:
 _dir = get_directories(path)
 _dir.sort()
 
+
+
+
+
 '''
 Make {aims.xyz} files  
 '''
@@ -46,12 +50,29 @@ ranked_dir_path = [x.replace("/scratch/scratch/uccatka/", "/home/uccatka/Scratch
 for i in ranked_dir_path:
     rank_ = i.split('/')[-1]
     if from_ <= int(rank_) <= to_:
+        
+        try:
+            with open(f'{i}/aims.out', 'r') as f:
+                if 'Have a nice' not in f.read():
+                    print(i)
+        except FileNotFoundError:
+            print(rank_)
+            #sys.exit()
+            continue
+
+
+
+for i in ranked_dir_path:
+    rank_ = i.split('/')[-1]
+    if from_ <= int(rank_) <= to_:
         print(int(rank_), i)
 
         os.chdir(i)
-        os.system("bash /home/uccatka/auto/aims_auto/aims_to_xyz.sh geometry.in.next_step")
-        print('.xyz file of aims optimised structure is generated')
-        
+        try:
+            os.system("bash /home/uccatka/auto/aims_auto/aims_to_xyz.sh geometry.in.next_step")
+            print('.xyz file of aims optimised structure is generated')
+        except :
+            pass
         dummy = glob.glob(i + '/aims.xyz')    			# ~P/aims.xyz  
         dummy_1 = glob.glob(i + '/' + i.split('/')[-1] + '.xyz')    	# ~P/001.xyz (KLMC)
         fname = ''.join(dummy)                                    
@@ -75,5 +96,6 @@ print()
 print("###############################################")
 print("##-----------Mission accomplished------------##")
 print("###############################################")
+
 
 

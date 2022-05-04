@@ -24,7 +24,7 @@ target = target.replace('/scratch/scratch/uccatka', '/home/uccatka/Scratch')
 from_ = int(input('from which step do you want to calculate? : '))
 to_   = int(input('up to which step do you want to calculate? : '))
 
-path = target + '/top_structures/'   
+path = target + '/gulp_xyz/'   
 dest = target + '/ranked/'          
 
 files = get_files(path, '.xyz')

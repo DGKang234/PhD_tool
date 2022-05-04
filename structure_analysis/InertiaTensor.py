@@ -97,7 +97,7 @@ class structure_shape:
                     # kd is Kronecker delta
                     #print(self.itensor)
 
-        eigVal, eigVec = np.linalg.eig(self.itensor)
+        self.eigVal, self.eigVec = np.linalg.eig(self.itensor)
 
         print()
         print(f"{fg(1)} {bg(15)} ### Inertia tensor ### {attr(0)}")
@@ -105,11 +105,11 @@ class structure_shape:
 
         print()
         print(f"{fg(1)} {bg(15)} ### Principal Axes of inertia ###{attr(0)}")
-        print(eigVal)
+        print(self.eigVal)
         print() 
         print("### eigenvector ###")
-        print(eigVec)
-        return None
+        print(self.eigVec)
+        return self.eigVal, self.eigVec
 
    
 '''

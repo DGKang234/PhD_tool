@@ -29,14 +29,16 @@ get_files(dir_xyzFiles, 'aims.xyz')  # source
 if 'gulp' in os.listdir('./'):
     shutil.rmtree('gulp')
     os.mkdir('gulp')
-    os.chdir('gulp')
+
 else:
     os.mkdir('gulp')
 
+
+os.chdir('./gulp')
+print(os.getcwd())
 gulp_error = []
 caution_scaling = []
 for x in files:
-    
     cation = []
     anion_core = []
     anion_shel = []
@@ -105,8 +107,10 @@ output xyz {dest}_gulp')             # 3760.000831  0.222000   0.00000 0.0 10.0\
     with open(gulp_output, 'r') as f:
         if 'Job Finished' in f.read():
             print(f'{dest} DONE')
+            print()
         else:
             print(f'!!!! {dest} Error !!!!')
+            print()
             gulp_error.append(x)
 
     ###############################
