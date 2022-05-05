@@ -9,9 +9,10 @@ from colored import fg, bg, attr
 
 
 class GULP:
-    def __init__(self):
-        self.FROM = int(sys.argv[1]) #int(input("[From] which order of frequency would you like to take? : "))
-        self.TO = int(sys.argv[2]) + 1 #int(input("[To] which order of frequency would you like to take? : ")) + 1
+    def __init__(self, FROM, TO):
+        self.FROM = FROM #int(sys.argv[1]) #int(input("[From] which order of frequency would you like to take? : "))
+        self.TO = TO+1 #int(sys.argv[2]) + 1 #int(input("[To] which order of frequency would you like to take? : ")) + 1
+        
 
     def Get_file_list(self, path, ext='.xyz'):
         #path = os.getcwd()
@@ -163,9 +164,9 @@ output xyz {path}/{path}_eig')
             #                   #
             deg_of_freedom = len(From)
             if self.FROM == 0:
-                TO = deg_of_freedom
-                freq = list(range(self.FROM, TO))
-            freq = list(range(self.FROM, TO))
+                self.TO = deg_of_freedom
+                freq = list(range(self.FROM, self.TO))
+            freq = list(range(self.FROM, self.TO))
     
             DUMMY = []
             for numj, j in enumerate(From):
