@@ -118,7 +118,7 @@ The test result should be idential to the 'gulp_eig_answer'
 .ipynb files
 
 ----
-Copyright © 2021 Dong gi Kang. All rights reserved. No warranty.
+Copyright © 2022 Dong gi Kang. All rights reserved. No warranty.
 
 This code is provided for reference only. You may republish any of this code verbatim with author and URL info intact.
 You need written permission from the author to make modifications to the code, include parts into your own work, etc.
