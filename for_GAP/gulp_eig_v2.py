@@ -9,10 +9,10 @@ from colored import fg, bg, attr
 
 
 class GULP:
-    def __init__(self, FROM, TO):
+    def __init__(self, STEP, FROM, TO):
         self.FROM = FROM #int(sys.argv[1]) #int(input("[From] which order of frequency would you like to take? : "))
-        self.TO = TO+1 #int(sys.argv[2]) + 1 #int(input("[To] which order of frequency would you like to take? : ")) + 1
-        
+        self.TO = TO+1 #int(sys.argv[2]) + 1 #int(input("[To] which order of frequency would you like to take? : ")) + 1       
+        self.STEP = STEP  
 
     def Get_file_list(self, path, ext='.xyz'):
         #path = os.getcwd()
@@ -204,9 +204,9 @@ output xyz {path}/{path}_eig')
                 os.mkdir(f'{path}/{str(freq[i])}')
                 print()
                 print(f'A + [{numi+1} eigenvec]')
-                for j in range(-100, 100, 1):
+                for j in range(-100, 100, self.STEP):                               # Resolution of frequency
 
-                    mod_eigvec_array = eigvec_array[i] * (int(j)/1000)
+                    mod_eigvec_array = eigvec_array[i] * (int(j)/100)
                     new_coord = coord + mod_eigvec_array
                     new_coord = np.around((new_coord), decimals = 9)
 

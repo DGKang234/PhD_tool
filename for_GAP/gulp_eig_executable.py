@@ -4,15 +4,22 @@ import time
 import shutil
 
 '''
-Calculate eigenvectors using GULP and add the eigenvectors to the cartesian 
-coordinate of optimised structure and prepare many xyz files.
+Brief explanation of what this code does:
+    Calculate eigenvectors using GULP and add the eigenvectors to the cartesian 
+    coordinate of optimised structure and prepare many xyz files.
 
-# update note source code versioni:
+HOW to execute the code:
+N.B. !!! the code requires [FOUR] argument !!!
+type [python gulp_eig_executable.py {[From] order of eigenvector component} {[To} order of eigenvector component} {Resolution of frequency} {[From] structure in IP rank} {[To] structure in IP rank}
+
+# UPDATE NOTE:
     * 0.0v (29 April 2022 - 29 April 2022): Testing version (fully working) - need to be modulised
-    * 1.0v (4 May - 5 May): Composed of classes and function for modulisation - fully modulised (using this in this executable)
-    * 1.1v (working on) : -> Allowing to select which IP rank structure to calculate
-                        -> Allowing to customise lambda ( lambda * eigenvector)
-                        -> Calling potential library instead of using written potential
+    * 1.0v (4 May - 5 May): Composed of classes and function for modulisation - fully modulised 
+        (using this in this executable)
+
+    * 1.1v (working on) : -> Allowing to select which IP rank structure to calculate        (V) Tick marked function is implemented in this code
+                          -> Allowing to customise lambda ( lambda * eigenvector)           (V)
+                          -> Calling potential library instead of using written potential   ( )
 '''
 
 
@@ -39,9 +46,17 @@ coordinate of optimised structure and prepare many xyz files.
 FROM = int(sys.argv[1])
 if FROM == 0:
     TO = 0
+    STEP = int(sys.argv[2])
+    FROM_rank = int(sys.argv[3])
+    TO_rank = int(sys.argv[4])
+
     pass
 else:
     TO = int(sys.argv[2])
+    STEP = int(sys.argv[3])
+    FROM_rank = int(sys.argv[4])
+    TO_rank = int(sys.argv[5])
+
 
 if 'gulp_eig' in os.listdir('./'):
     shutil.rmtree('gulp_eig')
@@ -49,9 +64,10 @@ if 'gulp_eig' in os.listdir('./'):
 else:
     os.mkdir('gulp_eig')
 
-start = time.process_time()
 
-GULP = gulp.GULP(FROM, TO)                  # use the class (GULP) to create objects
+start = time.process_time()                 # Start measuring the runtime.
+
+GULP = gulp.GULP(STEP, FROM, TO)                  # use the class (GULP) to create objects
 
 try:
     GULP.Re_top_str()                       # convert "top_structure/B{FirstStep}-{rank}.xyz" to "top_structures/{rank}.xyz"
@@ -62,20 +78,22 @@ files = GULP.Get_file_list(os.getcwd() + '/top_structures')     # get the full p
 os.chdir('gulp_eig')                                            # move to child path (parent working dir)
 
 for f in files:
-    cation, anion_core, anion_shel, dest, no_of_atoms = GULP.Convert_xyz_Gulp(f)    # retrieve info from xyz file 
-    
-    cwd = os.getcwd()                                                               # current working directory
-    
-    os.mkdir(dest)                                                                  # make working directory
-    
-    GULP.Write_Gulp(dest, cation, anion_core, anion_shel)                           # make gulp.in (gulp input file) at wd
-    
-    Gulp_output_path = GULP.Run_Gulp(cwd + '/' + dest, dest)                        # run gulp calc and get the output path
-    
-    total_energy, eigvec_array, freq = GULP.Grep_Data(Gulp_output_path, no_of_atoms, dest)  # retrieve essential data
-    
-    GULP.Modifying_xyz(dest, cwd + '/' + dest + f'/{dest}_eig.xyz',                 # optimised xyz + eigenvec
-    eigvec_array, freq, no_of_atoms, total_energy) 
+    marker = int(f.split('/')[-1].split('.')[0])
+    if FROM_rank <= marker <= TO_rank: 
+        cation, anion_core, anion_shel, dest, no_of_atoms = GULP.Convert_xyz_Gulp(f)    # retrieve info from xyz file 
+        
+        cwd = os.getcwd()                                                               # current working directory
+        
+        os.mkdir(dest)                                                                  # make working directory
+        
+        GULP.Write_Gulp(dest, cation, anion_core, anion_shel)                           # make gulp.in (gulp input file) at wd
+        
+        Gulp_output_path = GULP.Run_Gulp(cwd + '/' + dest, dest)                        # run gulp calc and get the output path
+        
+        total_energy, eigvec_array, freq = GULP.Grep_Data(Gulp_output_path, no_of_atoms, dest)  # retrieve essential data
+        
+        GULP.Modifying_xyz(dest, cwd + '/' + dest + f'/{dest}_eig.xyz',                 # optimised xyz + eigenvec
+        eigvec_array, freq, no_of_atoms, total_energy) 
 
 print(f"----- process time : {int((time.process_time() - start)/60)} mins {(time.process_time() - start) % 60} seconds, -----")
 
