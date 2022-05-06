@@ -33,7 +33,7 @@ Plotting RDF (radial distribution function) for bulk structures
 N.B.  Originally written in Jupyter lab and it's merely copied and pasted to this file
 
 ----
-
+----
 # aims_auto
 
 ## 0_preprocessing_step.py
