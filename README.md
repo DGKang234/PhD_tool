@@ -5,6 +5,8 @@
 #### Dong gi Kang, tonggih.kang.18@ucl.ac.uk
 
 ----
+----
+
 # Parent directory (current path)
 
 ## bulk_modulus_fit.py
@@ -34,6 +36,7 @@ N.B.  Originally written in Jupyter lab and it's merely copied and pasted to thi
 
 ----
 ----
+
 # aims_auto
 
 ## 0_preprocessing_step.py
@@ -68,6 +71,7 @@ Generating 'uniq_str_info.csv' file which contains 'IP energy, 'IP rank, 'delta 
 The directory where '1_XYZcollect.py', '2_essentials.py' copy the FHI-aims input file and job submission script.
 
 ---
+---
 
 # 2body_IP_fitting_grid
 
@@ -81,6 +85,7 @@ Collect the 2-body potential parameters and sum-of-squares from the fitting at '
 ## IP_visparam.py
 Plot contour map to show 2-body potential paramters as a function of sum-of-square from 'Data_standard.csv' and 'Data_relax.csv'
 
+----
 ----
 
 # for_GAP
@@ -114,10 +119,14 @@ Test data set. To test the code copy this directory as 'top_structures'
 The test result should be idential to the 'gulp_eig_answer'
 
 ----
+----
+
 ## Tools
 .ipynb files
 
 ----
+----
+
 Copyright © 2022 Dong gi Kang. All rights reserved. No warranty.
 
 This code is provided for reference only. You may republish any of this code verbatim with author and URL info intact.
