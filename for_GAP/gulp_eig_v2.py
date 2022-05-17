@@ -9,28 +9,32 @@ from colored import fg, bg, attr
 
 
 class GULP:
-    def __init__(self, STEP, FROM, TO):
+    def __init__(self, STEP, FROM, TO, SP):
         self.FROM = FROM #int(sys.argv[1]) #int(input("[From] which order of frequency would you like to take? : "))
         self.TO = TO+1 #int(sys.argv[2]) + 1 #int(input("[To] which order of frequency would you like to take? : ")) + 1       
         self.STEP = STEP  
-
+        self.SP = SP
+    
+    
+    
     def Get_file_list(self, path, ext='.xyz'):
-        #path = os.getcwd()
         files = [x for x in os.listdir(path) if ext in x]
         files = [(path + '/' + x) for x in files]
         files.sort()
         return files
 
+   
        
     def Label_top_str(self, xyz):
         return xyz.split('-')[1].split('.xyz')[0]
      
 
-    def Re_top_str(self):
+
+    def Re_top_str(self, TOP_structures='top_structures', Extension='.xyz'):
         cwd = os.getcwd()
-        path = cwd + '/top_structures/'
-        
-        xyz_orig = [x for x in os.listdir(path) if '.xyz' in x]
+        path = f'{cwd}/{TOP_structures}/'
+         
+        xyz_orig = [x for x in os.listdir(path) if Extension in x]
         xyz_orig_ordered = sorted(xyz_orig, key=self.Label_top_str)
         
         Max = xyz_orig_ordered[-1]
@@ -67,6 +71,7 @@ class GULP:
             os.rename(path + '/' + xyz, path + '/' + rename)
 
 
+
     def Convert_xyz_Gulp(self, f):
         cation = []
         anion_core = []
@@ -76,12 +81,12 @@ class GULP:
             for i, line in enumerate(coord):
                 if i > 1:
                     if 'Al' in line:
-                        c = line.replace('Al   ', 'Al  core')
+                        c = line.replace('Al', 'Al  core')
                         cation.append(c)
                     
                     if 'F' in line:
-                        a_core = line.replace('F   ', 'F   core')
-                        a_shel = line.replace('F   ', 'F   shel')
+                        a_core = line.replace('F', 'F   core')
+                        a_shel = line.replace('F', 'F   shel')
                         anion_core.append(a_core)
                         anion_shel.append(a_shel)
 
@@ -107,9 +112,15 @@ class GULP:
         return cation, anion_core, anion_shel, dest, no_of_atoms
 
 
-    def Write_Gulp(self, path, cation, anion_core, anion_shel):
+
+    def Write_Gulp(self, path, outXYZ, cation, anion_core, anion_shel, SP):
+        if SP == 'y':
+            keywords = 'single eigenvectors'
+        else:
+            keywords = 'opti conp conj prop eigenvectors'
+
         with open(path + '/gulp.gin', 'w') as f:
-            f.write('opti conp conj prop eigenvectors\ncartesian\n')
+            f.write(f'{keywords}\ncartesian\n')
             f.write(cation)
             f.write(anion_core)
             f.write(anion_shel)
@@ -127,14 +138,16 @@ ftol opt 5.000\n\
 gtol opt 8.000\n\
 switch_min rfo gnorm 0.01\n\
 maxcyc 2000\n\n\
-output xyz {path}/{path}_eig')
+output xyz {outXYZ}_eig')
 
 
-    def Run_Gulp(self, path_to_gulp, dest):
+
+    def Run_Gulp(self, path_of_gulp, dest):
         subprocess.check_output(['gulp', f'{dest}/gulp'])
-        gulp_output_path = os.path.join(path_to_gulp, 'gulp.gout')            
+        gulp_output_path = os.path.join(path_of_gulp, 'gulp.gout')            
         return gulp_output_path
     
+
 
     def Grep_Data(self, gulp_output_path, no_of_atoms, dest):
         with open(gulp_output_path, 'r') as f:
@@ -204,7 +217,7 @@ output xyz {path}/{path}_eig')
                 os.mkdir(f'{path}/{str(freq[i])}')
                 print()
                 print(f'A + [{numi+1} eigenvec]')
-                for j in range(-100, 100, self.STEP):                               # Resolution of frequency
+                for j in range(-100, 100, self.STEP):                      # Resolution of frequency
 
                     mod_eigvec_array = eigvec_array[i] * (int(j)/100)
                     new_coord = coord + mod_eigvec_array
@@ -213,7 +226,7 @@ output xyz {path}/{path}_eig')
                     stack = np.c_[ID, new_coord]
                     stack = stack.tolist()
 
-                    with open(f'{path}/{freq[i]}/{str(j)}.xyz', 'w') as f:
+                    with open(f'{path}/{freq[i]}/mod_{str(j)}.xyz', 'w') as f:
                         f.write(str(no_of_atoms) + '\n')
                         f.write(total_energy + '\n')
 
@@ -224,33 +237,18 @@ output xyz {path}/{path}_eig')
                     for k in stack:
                         new = '\t\t'.join(k) + '\n'
 
-                        with open(f'{path}/{freq[i]}/{str(j)}.xyz', 'a') as f:
+                        with open(f'{path}/{freq[i]}/mod_{str(j)}.xyz', 'a') as f:
                             f.write(new)
 
                         with open(f'{path}/{freq[i]}/movie.xyz', 'a') as f:
                             f.write(new)
-
                 print()
-        print()            
+        print()
+        
+        return None
+         
 
 
-#if __name__ == '__main__':
-#    start = time.process_time()
-#   
-#    GULP = GULP()
-#    GULP.Re_top_str()
-#    files = GULP.Get_file_list(os.getcwd() + '/top_structures')
-#    os.mkdir('gulp_eig')
-#    os.chdir('gulp_eig')
-#    for f in files:
-#        cation, anion_core, anion_shel, dest, no_of_atoms = GULP.Convert_xyz_Gulp(f)
-#        cwd = os.getcwd()
-#        os.mkdir(dest)
-#        GULP.Write_Gulp(dest)    
-#        Gulp_output_path = GULP.Run_Gulp(cwd + '/' + dest) 
-#        total_energy, eigvec_array, freq = GULP.Grep_Data(Gulp_output_path)
-#        GULP.Modifying_xyz(dest, cwd + '/' + dest + f'/{dest}_eig.xyz', freq) 
-#    print(f"----- process time : {int((time.process_time() - start)/60)} mins {(time.process_time() - start) % 60} seconds, -----")
-
+        
 
 

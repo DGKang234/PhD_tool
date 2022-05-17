@@ -9,8 +9,17 @@ Brief explanation of what this code does:
     coordinate of optimised structure and prepare many xyz files.
 
 HOW to execute the code:
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 N.B. !!! the code requires [FOUR] argument !!!
-type [python gulp_eig_executable.py {[From] order of eigenvector component} {[To} order of eigenvector component} {Resolution of frequency} {[From] structure in IP rank} {[To] structure in IP rank}
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+To execute the code please type: 
+-> If you want to choose specific eigenvalues
+[python /{path}/{to}/gap_pre_executable.py {[From]th eigenvalue component} {[To}th eigenvalue component} {Resolution (lambda) of frequency} {[From] IP rank structure in IP rank} {[To] IP rank structure in IP rank}]
+
+-> If you want to run ALL eigenvalues
+[python /{path}/{to}/gap_pre_executable.py {0} {Resulution (lambda)} of frequency} {[From] IP rank structure in IP rank} {[To] IP rank structure in IP rank}]
+
 
 # UPDATE NOTE:
     * 0.0v (29 April 2022 - 29 April 2022): Testing version (fully working) - need to be modulised
@@ -79,23 +88,38 @@ os.chdir('gulp_eig')                                            # move to child 
 
 for f in files:
     marker = int(f.split('/')[-1].split('.')[0])
-    if FROM_rank <= marker <= TO_rank: 
+    if FROM_rank <= marker <= TO_rank:
+        
         cation, anion_core, anion_shel, dest, no_of_atoms = GULP.Convert_xyz_Gulp(f)    # retrieve info from xyz file 
         
         cwd = os.getcwd()                                                               # current working directory
         
-        os.mkdir(dest)                                                                  # make working directory
-        
+        os.mkdir(dest)    
+
         GULP.Write_Gulp(dest, cation, anion_core, anion_shel)                           # make gulp.in (gulp input file) at wd
         
         Gulp_output_path = GULP.Run_Gulp(cwd + '/' + dest, dest)                        # run gulp calc and get the output path
         
         total_energy, eigvec_array, freq = GULP.Grep_Data(Gulp_output_path, no_of_atoms, dest)  # retrieve essential data
-        
-        GULP.Modifying_xyz(dest, cwd + '/' + dest + f'/{dest}_eig.xyz',                 # optimised xyz + eigenvec
+       
+        PATH = os.path.join(cwd, dest) 
+        GULP.Modifying_xyz(dest, PATH + f'/{dest}_eig.xyz',                 # optimised xyz + eigenvec
         eigvec_array, freq, no_of_atoms, total_energy) 
+ 
+        
+        sub_wd = [x for x in os.listdir(PATH) if os.path.isdir(f'{PATH}/{x}')]
+
+        for i in sub_wd:
+            SUB_PATH = os.path.join(PATH, i)
+            mod_list = sorted([x for x in os.listdir(SUB_PATH) if 'movie.xyz' not in x], key = lambda x: int(x.split('.')[0]))
+            mod_list_PATH = [os.path.join(SUB_PATH, x) for x in mod_list] 
+            print(mod_list_PATH)
+
+
+
 
 print(f"----- process time : {int((time.process_time() - start)/60)} mins {(time.process_time() - start) % 60} seconds, -----")
+
 
 
 
