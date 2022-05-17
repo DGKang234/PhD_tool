@@ -1,7 +1,7 @@
 # Tools for nanoclusters material research
 
 #### Language: python 3.x
-#### Software requirement: KLMC, GULP, FHI-aims
+#### Software requirement: KLMC, GULP, FHI-aims, GAP, QUIP
 #### Dong gi Kang, tonggih.kang.18@ucl.ac.uk
 
 ----
