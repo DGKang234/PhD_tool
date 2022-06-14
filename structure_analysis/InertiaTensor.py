@@ -26,8 +26,6 @@ class structure_shape:
             self.coord = self.coord[:, 1:].astype(float)                    # atom position
             
             dummy_atom = np.zeros((1,3), dtype=float)                       # empty array
-            #self.coord = np.append(self.coord, dummy_atom, axis = 0) 
-            #self.coord = np.append(self.coord, dummy_atom, axis = 0)
            
             print()
             print("### original atomic position ###") 
@@ -65,12 +63,7 @@ class structure_shape:
         self.coord = list(zip(self.coord_x, self.coord_y, self.coord_z))                   # zip the subtracted coordinates into one list
         self.coord = np.array(self.coord)                                                  # transform into array
       
-        #self.coord = np.delete(self.coord, -1, 0)
-        #self.coord = np.delete(self.coord, -1, 0)
-
         dummy_atom = np.zeros((1,3), dtype=float)
-        #self.coord = np.append(self.coord, dummy_atom, axis = 0)
-        #self.coord = np.append(self.coord, dummy_atom, axis = 0)
 
         print()
         print("### Shift atomic positions to the COM (my coordinate system (0, 0, 0)) ###")
