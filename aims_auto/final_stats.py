@@ -46,7 +46,7 @@ collect stats (single point DFT energy, final DFT energy, klmc energy and rankin
 
 output_group = './ranked/'
 sp_marker = '| Total energy                  :'
-final_marker = '| Total energy of the DFT / Hartree-Fock s.c.f. calculation      :     '
+final_marker = 'Hartree-Fock s.c.f. calculation      :' #'| Total energy of the DFT / Hartree-Fock s.c.f. calculation      :     '
 klmc_marker = 'SCF Done'
 gulp_marker = 'Final energy ='
 
@@ -60,14 +60,16 @@ collection_sp_E = []
 collection_final_E = []
 
 for num, i in enumerate(out_full_path):
+    print(i)
     with open(i, 'r') as f:
         lines = f.readlines()
         sp_from_each_file = ['-' + x.split('-')[2].split(' ')[0] for x in lines if sp_marker in x]
-        final_from_each_file = ['-' + x.split('-')[2].split(' ')[0] for x in lines if final_marker in x] 
-
+        final_from_each_file = ['-' + x.split('-')[2].split(' ')[0] for x in lines if final_marker in x]
+        #final_from_each_file = [float(x.split(':')[1].split('eV')[0]) for x in lines if final_marker in x] 
+        print(final_from_each_file)
         collection_sp_E.append(sp_from_each_file[0])
         collection_final_E.append(final_from_each_file[0])
-        print(i) 
+        print()
 
 
 df = pd.DataFrame(columns = ['IP_rank', 'SP_E', 'Final_E'])
@@ -126,6 +128,7 @@ out_full_path.sort()
 
 collection_gulp_E = []
 for num, i in enumerate(out_full_path):
+    print(i)
     with open(i, 'r') as f:
         lines = f.readlines()
         gulp_from_each_file = [x.split()[3] for x in lines if gulp_marker in x]   

@@ -28,11 +28,13 @@ program rdf
   character :: atname
   character (len = 255) :: buffer, ipf, name
   logical :: present
-  binwidth=0.1!angstrom
-  sig2=0.01   !variance
+  binwidth=0.05!angstrom
+  !sig2=0.01   !variance		default
+  sig2=0.01   !variance		
 
   !print *, "Type in the name of the xyz file (if it is bob.xyz then just type bob)"
   read(5,*) name
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ipf=trim(name)//".xyz"
   
   inquire(file=ipf,exist=present)
@@ -41,8 +43,8 @@ program rdf
   else
      error stop "Cannot find the input file"
   end if
-
-    
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 
   open(newunit=ipu,file=ipf)
   ios=0
   read(ipu,'(a)',iostat=ios) buffer

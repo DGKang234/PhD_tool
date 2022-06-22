@@ -241,19 +241,15 @@ output xyz {outXYZ}_eig\n')
         with open(gulp_new_xyz, 'r') as f:
             lines = f.readlines()[2:]
 
-            #print('gulp_new_xyz ########################')
-            #print(gulp_new_xyz) 
-
             coord = [x.split() for x in lines]
             array = np.asarray(coord)
             coord = array[:, 1:].astype(float)
             ID = array[:, 0].astype(str)
 
             for numi, i in enumerate(range(len(freq))):
-                os.mkdir(f'{path}/{str(freq[i])}')
+                os.mkdir(f'{path}/{str(freq[i])}')                  #001/0
                 print()
                 print(f'optimised cartesian coordinates + [{numi+1} eigenvec]')
-
                 if self.STEP == 0:
                     mod_eigvec_array = eigvec_array[i]
                     new_coord = coord + mod_eigvec_array
@@ -262,94 +258,149 @@ output xyz {outXYZ}_eig\n')
                     stack = np.c_[ID, new_coord]
                     stack = stack.tolist()
 
-                    with open(f'{path}/{freq[i]}/mod_0.xyz', 'w') as f:
-                        f.write(str(no_of_atoms) + '\n')
-                        f.write(total_energy + '\n')
+                    #with open(f'{path}/{freq[i]}/mod_0.xyz', 'w') as f:
+                    #    f.write(str(no_of_atoms) + '\n')
+                    #    f.write(total_energy + '\n')
                     with open(f'{path}/{freq[i]}/movie.xyz', 'a') as f:
                         f.write(str(no_of_atoms) + '\n')
                         f.write(total_energy + '\n')
                     for k in stack:
                         new = '\t\t'.join(k) + '\n'
-                        
-                        with open(f'{path}/{freq[i]}/mod_0.xyz', 'a') as f:
-                            f.write(new)
+                        #with open(f'{path}/{freq[i]}/mod_0.xyz', 'a') as f:
+                        #    f.write(new)
                         with open(f'{path}/{freq[i]}/movie.xyz', 'a') as f:
                             f.write(new)
 
                 else:
-                    for j in range(-200, 201, self.STEP):                      # Resolution of frequency
-                        mod_eigvec_array = eigvec_array[i] * (int(j)/100)
-                        new_coord = coord + mod_eigvec_array
-                        new_coord = np.around((new_coord), decimals = 9)
+                    for j in range(-100, 101, self.STEP):                      # Resolution of frequency
+                        if j != 0:
+                            mod_eigvec_array = eigvec_array[i] * (int(j)/100)
+                            # step=10 -> [-1.0, -0.9, -0.8, -0.7, -0.6, -0.5,...]
+                            # step=30 -> [-1.0, -0.7, -0.4, -0.1, 0.2, 0.5, ...]
+                            new_coord = coord + mod_eigvec_array
+                            new_coord = np.around((new_coord), decimals = 9)
 
-                        stack = np.c_[ID, new_coord]
-                        stack = stack.tolist()
+                            stack = np.c_[ID, new_coord]
+                            stack = stack.tolist()
 
-                        with open(f'{path}/{freq[i]}/mod_{str(j)}.xyz', 'w') as f:
-                            f.write(str(no_of_atoms) + '\n')
-                            f.write(total_energy + '\n')
-
-                        with open(f'{path}/{freq[i]}/movie.xyz', 'a') as f:
-                            f.write(str(no_of_atoms) + '\n')
-                            f.write(total_energy + '\n')
-
-                        for k in stack:
-                            new = '\t\t'.join(k) + '\n'
-
-                            with open(f'{path}/{freq[i]}/mod_{str(j)}.xyz', 'a') as f:
-                                f.write(new)
+                            with open(f'{path}/{freq[i]}/mod_{str(j)}.xyz', 'w') as f:
+                                f.write(str(no_of_atoms) + '\n')
+                                f.write(total_energy + '\n')
 
                             with open(f'{path}/{freq[i]}/movie.xyz', 'a') as f:
-                                f.write(new)
+                                f.write(str(no_of_atoms) + '\n')
+                                f.write(total_energy + '\n')
+
+                            for k in stack:
+                                new = '\t\t'.join(k) + '\n'
+
+                                with open(f'{path}/{freq[i]}/mod_{str(j)}.xyz', 'a') as f:
+                                    f.write(new)
+
+                                with open(f'{path}/{freq[i]}/movie.xyz', 'a') as f:
+                                    f.write(new)
                     print()
         print()
         
         return None
          
 
-    def Ext_xyz_gulp(self, FINAL_PATH_FULL, no_of_atoms, eigvec_array, FORCES, ENERGY):
-        
-        index = int(FINAL_PATH_FULL.split('/')[-2])
-        eigvec_array = eigvec_array[index]
-        drv_name = FINAL_PATH_FULL.split('/')[-1] + '_F_out.drv'
-        xyz_name = FINAL_PATH_FULL.split('/')[-1] + '_eig.xyz'
 
-        with open(f'{FINAL_PATH_FULL}/{xyz_name}', 'r') as f:
+    def Breathing_xyz(self, path, gulp_new_xyz, no_of_atoms, total_energy):
+        with open(gulp_new_xyz, 'r') as f:
             lines = f.readlines()[2:]
 
-        array = [x.split() for x in lines]
-        array = np.asarray(array)
-        coord = array[:, 1:].astype(float)
-        atom = array[:, 0].astype(str)
-        
-        coord_and_eigvec = coord + eigvec_array
-        coord_and_force = np.c_[coord_and_eigvec, FORCES]
-        coord_and_force = np.round(coord_and_force, decimals=6) 
-        atom_coord_and_force = np.c_[atom, coord_and_eigvec, FORCES]
-        atom_coord_and_force = atom_coord_and_force.tolist()
+            coord = [x.split() for x in lines]
+            array = np.asarray(coord)
+            coord = array[:, 1:].astype(float)
+            ID = array[:, 0].astype(str)
 
-        ext_xyz = os.path.join(FINAL_PATH_FULL, 'ext_gulp.xyz')
-        with open(ext_xyz, 'a') as f:
-            f.write(str(no_of_atoms))
-            f.write('\n')
-            f.write(f'Properties=species:S:1:pos:R:3:forces:R:3 energy={ENERGY} pbc="F F F"')
-            f.write('\n')
-            for i in atom_coord_and_force:
-                new = [str(x) for x in i]
-                new = '    '.join(new) + '\n'
-                f.write(new) 
+            com = coord.sum(axis=0)
+            com = com/np.shape(coord)[0]
+            coord_x = np.subtract(coord[:, 0], com[0], out=coord[:, 0])
+            coord_y = np.subtract(coord[:, 1], com[1], out=coord[:, 1])
+            coord_z = np.subtract(coord[:, 2], com[2], out=coord[:, 2])
+    
+            coord = list(zip(coord_x, coord_y, coord_z))                 
+            coord = np.array(coord)
 
-        with open('ext_movie.xyz', 'a') as f:
-            f.write(str(no_of_atoms))
-            f.write('\n')
-            f.write(f'Properties=species:S:1:pos:R:3:forces:R:3 energy={ENERGY} pbc="F F F"')
-            f.write('\n')
-            for i in atom_coord_and_force:
-                new = [str(x) for x in i]
-                new = '    '.join(new) + '\n'
-                f.write(new)
-         
+            breathing_dir = f'{path}/Breathing'
+            #os.mkdir(breathing_dir)
+            os.mkdir(f'{path}/100')
+            for ii in range(0, 50, 10):
+                print('#####')
+                print(round(1+int(ii)/100, 2))
+                breathing_coord = coord * (round(1+int(ii)/100, 2))
+                breathing_coord = np.around((breathing_coord), 6)
+                stack = np.c_[ID, breathing_coord]
+                stack = stack.tolist()
 
+                #breathing_dir = f'{path}/B_{str(int(ii)/100)}'
+                #os.mkdir(breathing_dir)
+                with open(f'{path}/100/B_{str(ii)}.xyz', 'w') as f:
+                    f.write(str(no_of_atoms) + '\n')
+                    f.write(total_energy + '\n')
+                with open(f'{path}/100/movie.xyz', 'a') as f:
+                    f.write(str(no_of_atoms) + '\n')
+                    f.write(total_energy + '\n')
+                
+                for jj in stack:
+                    new_line = '\t\t'.join(jj) + '\n' 
+                    with open(f'{path}/100/B_{str(ii)}.xyz', 'a') as f:
+                        f.write(new_line)
+                    with open(f'{path}/100/movie.xyz', 'a') as f:
+                        f.write(new_line)
+        print()
+
+        return None
+
+
+
+
+
+    def Ext_xyz_gulp(self, FINAL_PATH_FULL, no_of_atoms, eigvec_array, FORCES, ENERGY):
+        print('FINAL_PATH_FULL')
+        print(FINAL_PATH_FULL) 
+        index = int(FINAL_PATH_FULL.split('/')[-2])
+        if index != 100:
+            eigvec_array = eigvec_array[index]
+            drv_name = FINAL_PATH_FULL.split('/')[-1] + '_F_out.drv'
+            xyz_name = FINAL_PATH_FULL.split('/')[-1] + '_eig.xyz'
+
+            with open(f'{FINAL_PATH_FULL}/{xyz_name}', 'r') as f:
+                lines = f.readlines()[2:]
+
+            array = [x.split() for x in lines]
+            array = np.asarray(array)
+            coord = array[:, 1:].astype(float)
+            atom = array[:, 0].astype(str)
+            
+            coord_and_eigvec = coord + eigvec_array
+            coord_and_force = np.c_[coord_and_eigvec, FORCES]
+            coord_and_force = np.round(coord_and_force, decimals=6) 
+            atom_coord_and_force = np.c_[atom, coord_and_eigvec, FORCES]
+            atom_coord_and_force = atom_coord_and_force.tolist()
+
+            ext_xyz = os.path.join(FINAL_PATH_FULL, 'ext_gulp.xyz')
+            with open(ext_xyz, 'a') as f:
+                f.write(str(no_of_atoms))
+                f.write('\n')
+                f.write(f'Properties=species:S:1:pos:R:3:forces:R:3 energy={ENERGY} pbc="F F F"')
+                f.write('\n')
+                for i in atom_coord_and_force:
+                    new = [str(x) for x in i]
+                    new = '    '.join(new) + '\n'
+                    f.write(new) 
+
+            with open('ext_movie.xyz', 'a') as f:
+                f.write(str(no_of_atoms))
+                f.write('\n')
+                f.write(f'Properties=species:S:1:pos:R:3:forces:R:3 energy={ENERGY} pbc="F F F"')
+                f.write('\n')
+                for i in atom_coord_and_force:
+                    new = [str(x) for x in i]
+                    new = '    '.join(new) + '\n'
+                    f.write(new)
         return None
         
 
